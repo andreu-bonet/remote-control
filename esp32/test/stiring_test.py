@@ -71,7 +71,9 @@ def wifiConnect(ssid, password):
 
 	return station.ifconfig()
 
-wifiConnect('Eurecat_Lab', 'Eureca2021!')
+ifconfig = wifiConnect('Eurecat_Lab', 'Eureca2021!')
+
+print(ifconfig)
 
 socket = usocket.socket(usocket.AF_INET, usocket.SOCK_STREAM)
 socket.bind(('', 3000))
