@@ -1,0 +1,15 @@
+{
+  "name": "blink",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "main": "ampy -p COM5 run main.py",
+    "http": "ampy -p COM5 run http.py",
+    "gprs": "ampy -p COM5 run gprs.py",
+    "blink": "ampy -p COM5 run blink.py"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
