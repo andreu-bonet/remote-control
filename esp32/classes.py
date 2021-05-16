@@ -1,4 +1,5 @@
 from machine import Pin
+from time import sleep_us
 
 
 class PrecisionStepper:
@@ -22,9 +23,9 @@ class PrecisionStepper:
 	def steps(self, step_count):
 		for i in range(abs(step_count)):
 			self.stp.value(1)
-			thime.sleep_us(self.step_time)
+			sleep_us(self.step_time)
 			self.stp.value(0)
-			thime.sleep_us(self.step_time)
+			sleep_us(self.step_time)
 
 	def mm(self, mm, step_per_mm):
 		self.steps(mm * step_per_mm)
