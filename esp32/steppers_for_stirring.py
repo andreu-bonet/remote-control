@@ -45,9 +45,13 @@ class Precision_Stepper:
 
 Steppers_Stirring = Precision_Stepper(step_pin=19, dir_pin=21, en_pin=18, step_time=700)
 
-Steppers_Stirring.power_on()
-Steppers_Stirring.set_dir(1)
-deadline = ticks_add(time.ticks_ms(), 1000 * 5)
-while ticks_diff(deadline, time.ticks_ms()) > 0:
-    Steppers_Stirring.steps(1)
-Steppers_Stirring.power_off()
+def stiring(duration_seconds):
+    Steppers_Stirring.power_on()
+    Steppers_Stirring.set_dir(1)
+    deadline = ticks_add(time.ticks_ms(), duration_seconds * 1000)
+    while ticks_diff(deadline, time.ticks_ms()) > 0:
+        Steppers_Stirring.steps(1)
+    Steppers_Stirring.power_off()
+
+
+stiring(10)
