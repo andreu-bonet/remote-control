@@ -45,9 +45,9 @@ class Precision_Stepper:
 		"""Set time in microseconds between each step."""
 		self.step_time = us
 
-Steppers_Stirring = Precision_Stepper(step_pin=19, dir_pin=21, en_pin=18, step_time=700)
+Steppers_Stirring = Precision_Stepper(step_pin=19, dir_pin=21, en_pin=18, step_time=1000)
 Stepper_Autosampler = Precision_Stepper(step_pin=2, dir_pin=4, en_pin=15, step_time=1)
-Stepper_Syringe_Pump = Precision_Stepper(step_pin=32, dir_pin=5, en_pin=33, step_time=100)
+Stepper_Syringe_Pump = Precision_Stepper(step_pin=32, dir_pin=5, en_pin=33, step_time=1000)
 
 Microstepping = 32
 Standard_Step_Angle = 1.8
