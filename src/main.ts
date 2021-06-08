@@ -21,21 +21,20 @@ app.post('/esp32', (req: Request, res: Response) => {
 })
 
 app.post('/', async (req: Request, res: Response) => {
-	switch (req.body.command) {
-		case 'stiring':
-			if (process.env.ESP32_IP) {
-				console.log(`stiring ${req.body.blink}`)
-				axios.post(process.env.ESP32_IP, `stiring ${req.body.blink}`).catch(err => console.log(err.errno))
-			}
-			break
-		case 'autosampler':
-			if (process.env.ESP32_IP) {
-				console.log(`autosampler ${req.body.direction} ${req.body.travel}`)
-				axios.post(process.env.ESP32_IP, `autosampler ${req.body.direction} ${req.body.travel}`).catch(err => console.log(err.errno))
-			}
-			break
-		default:
-			break
+	if (!process.env.ESP32_IP) return
+	const command = req.body.command
+	if (command === 'stiring') {
+		const data = `stiring ${req.body.blink}`
+		console.log(data)
+		axios.post(process.env.ESP32_IP, data).catch(err => console.log(err.errno))
+	} else if (command === 'autosampler') {
+		const data = `autosampler ${req.body.direction} ${req.body.travel}`
+		console.log(data)
+		axios.post(process.env.ESP32_IP, data).catch(err => console.log(err.errno))
+	} else if (command === 'syringepump') {
+		const data = `syringepump ${req.body.direction} ${req.body.travel}`
+		console.log(data)
+		axios.post(process.env.ESP32_IP, data).catch(err => console.log(err.errno))
 	}
 	res.sendFile(path.join(process.cwd(), 'public', 'index.html'))
 })

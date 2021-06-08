@@ -47,6 +47,7 @@ class Precision_Stepper:
 
 Steppers_Stirring = Precision_Stepper(step_pin=19, dir_pin=21, en_pin=18, step_time=700)
 Stepper_Autosampler = Precision_Stepper(step_pin=2, dir_pin=4, en_pin=15, step_time=1)
+Stepper_Syringe_Pump = Precision_Stepper(step_pin=32, dir_pin=5, en_pin=33, step_time=100)
 
 Microstepping = 32
 Standard_Step_Angle = 1.8
@@ -68,6 +69,12 @@ def autosampler(direction, travel):
 	Stepper_Autosampler.power_on()
 	Stepper_Autosampler.mm(abs(travel), Step_Per_mm)
 	Stepper_Autosampler.power_off()
+
+def syringepump(direction, travel):
+	Stepper_Syringe_Pump.set_dir(direction)
+	Stepper_Syringe_Pump.power_on()
+	Stepper_Syringe_Pump.mm(abs(travel), Step_Per_mm)
+	Stepper_Syringe_Pump.power_off()
 
 def wifiConnect(ssid, password):
 	station = network.WLAN(network.STA_IF)
@@ -102,6 +109,8 @@ while True:
 		stiring(int(command[1]))
 	elif command[0] == 'autosampler':
 		autosampler(int(command[1]), int(command[2]))
+	elif command[0] == 'syringepump':
+		syringepump(int(command[1]), int(command[2]))
 	conn.send('HTTP/1.1 200 OK\n')
 	conn.send('Content-Type: text/plain\n')
 	conn.send('Connection: close\n\n')
