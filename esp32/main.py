@@ -46,6 +46,14 @@ class Precision_Stepper:
         self.step_time = us
 
 Steppers_Stirring = Precision_Stepper(step_pin=19, dir_pin=21, en_pin=18, step_time=700)
+Stepper_Autosampler = Precision_Stepper(step_pin=2, dir_pin=4, en_pin=15, step_time=1)
+
+Microstepping = 32
+Standard_Step_Angle = 1.8
+Pich_in_mm = 8
+Full_rev = 360
+Relation = (Full_rev / Standard_Step_Angle) / Pich_in_mm
+Step_Per_mm = Relation * Microstepping
 
 def stiring(duration_seconds):
     Steppers_Stirring.power_on()
@@ -55,6 +63,11 @@ def stiring(duration_seconds):
         Steppers_Stirring.steps(1)
     Steppers_Stirring.power_off()
 
+def autosampler(direction, travel):
+    Stepper_Autosampler.set_dir(direction)
+    Stepper_Autosampler.power_on()
+    Stepper_Autosampler.mm(abs(travel), Step_Per_mm)
+    Stepper_Autosampler.power_off()
 
 def wifiConnect(ssid, password):
 	station = network.WLAN(network.STA_IF)
@@ -87,6 +100,8 @@ while True:
 	print(command)
 	if command[0] == 'stiring':
 		stiring(int(command[1]))
+    elif command[0] == 'autosampler':
+        autosampler(int(command[1]), int(command[2]))
 	conn.send('HTTP/1.1 200 OK\n')
 	conn.send('Content-Type: text/plain\n')
 	conn.send('Connection: close\n\n')

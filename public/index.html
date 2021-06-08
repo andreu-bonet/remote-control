@@ -10,8 +10,18 @@
 
 <body>
 	<form method="post">
+		<input type="text" name="command" value="stiring" hidden>
 		<label>Stiring time (seconds): </label>
 		<input type="number" name="blink" value="30" min="1" max="120">
+		<input type="submit" value="Send">
+	</form>
+	<br>
+	<form method="post">
+		<input type="text" name="command" value="autosampler" hidden>
+		<label>Autosampler direction (0,1): </label>
+		<input type="number" name="direction" value="0" min="0" max="1">
+		<label>Autosampler travel (mm): </label>
+		<input type="number" name="travel" value="5" min="1" max="100">
 		<input type="submit" value="Send">
 	</form>
 </body>
