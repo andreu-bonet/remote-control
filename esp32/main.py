@@ -120,17 +120,23 @@ def syringepump(direction, travel):
 
 def valvecathode(duration_miliseconds):
 	Valve_Cathode.engage()
-	time.sleep_ms(duration_miliseconds)
+	deadline = ticks_add(time.ticks_ms(), duration_miliseconds)
+	while ticks_diff(deadline, time.ticks_ms()) > 0:
+		pass
 	Valve_Cathode.disengage()
 
 def valveanode(duration_miliseconds):
 	Valve_Anode.engage()
-	time.sleep_ms(duration_miliseconds)
+	deadline = ticks_add(time.ticks_ms(), duration_miliseconds)
+	while ticks_diff(deadline, time.ticks_ms()) > 0:
+		pass
 	Valve_Anode.disengage()
 
 def peristalticpump(duration_miliseconds):
 	Pump.engage()
-	time.sleep_ms(duration_miliseconds)
+	deadline = ticks_add(time.ticks_ms(), duration_miliseconds)
+	while ticks_diff(deadline, time.ticks_ms()) > 0:
+		pass
 	Pump.disengage()
 
 def wifiConnect(ssid, password):
