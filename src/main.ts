@@ -35,6 +35,18 @@ app.post('/', async (req: Request, res: Response) => {
 		const data = `syringepump ${req.body.direction} ${req.body.travel}`
 		console.log(data)
 		axios.post(process.env.ESP32_IP, data).catch(err => console.log(err.errno))
+	} else if (command === 'valvecathode') {
+		const data = `valvecathode ${req.body.duration}`
+		console.log(data)
+		axios.post(process.env.ESP32_IP, data).catch(err => console.log(err.errno))
+	} else if (command === 'valveanode') {
+		const data = `valveanode ${req.body.duration}`
+		console.log(data)
+		axios.post(process.env.ESP32_IP, data).catch(err => console.log(err.errno))
+	} else if (command === 'peristalticpump') {
+		const data = `peristalticpump ${req.body.duration}`
+		console.log(data)
+		axios.post(process.env.ESP32_IP, data).catch(err => console.log(err.errno))
 	}
 	res.sendFile(path.join(process.cwd(), 'public', 'index.html'))
 })

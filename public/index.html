@@ -27,10 +27,31 @@
 	<br>
 	<form method="post">
 		<input type="text" name="command" value="syringepump" hidden>
-		<label>Autosampler direction (0,1): </label>
+		<label>Syringe Pump direction (0,1): </label>
 		<input type="number" name="direction" value="0" min="0" max="1">
-		<label>Autosampler travel (mm): </label>
+		<label>Syringe Pump travel (mm): </label>
 		<input type="number" name="travel" value="5" min="1" max="100">
+		<input type="submit" value="Send">
+	</form>
+	<br>
+	<form method="post">
+		<input type="text" name="command" value="valvecathode" hidden>
+		<label>Valve Cathode duration (ms): </label>
+		<input type="number" name="duration" value="15000" min="1">
+		<input type="submit" value="Send">
+	</form>
+	<br>
+	<form method="post">
+		<input type="text" name="command" value="valveanode" hidden>
+		<label>Valve Anode duration (ms): </label>
+		<input type="number" name="duration" value="15000" min="1">
+		<input type="submit" value="Send">
+	</form>
+	<br>
+	<form method="post">
+		<input type="text" name="command" value="peristalticpump" hidden>
+		<label>Peristaltic Pump duration (ms): </label>
+		<input type="number" name="duration" value="8250" min="1">
 		<input type="submit" value="Send">
 	</form>
 </body>
