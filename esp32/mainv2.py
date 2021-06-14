@@ -1,10 +1,10 @@
 import network
 import usocket
-import time
-from utime import ticks_add
-from utime import ticks_diff
 from machine import Pin
 from time import sleep_us
+from time import ticks_ms
+from utime import ticks_add
+from utime import ticks_diff
 
 
 class Stepper:
@@ -67,14 +67,14 @@ anode_valve = Single(pin=14, engage_value=1, disengage_value=0)
 def stiring(duration_ms):
 	stirrer_stepper.power_on()
 	stirrer_stepper.set_direction(1)
-	deadline = ticks_add(time.ticks_ms(), duration_ms)
-	while ticks_diff(deadline, time.ticks_ms()) > 0:
+	deadline = ticks_add(ticks_ms(), duration_ms)
+	while ticks_diff(deadline, ticks_ms()) > 0:
 		stirrer_stepper.rotate_steps(1)
 	stirrer_stepper.power_off()
 
 def sleep_ms(ms):
-	deadline = ticks_add(time.ticks_ms(), ms)
-	while ticks_diff(deadline, time.ticks_ms()) > 0:
+	deadline = ticks_add(ticks_ms(), ms)
+	while ticks_diff(deadline, ticks_ms()) > 0:
 		pass
 
 def wifiConnect(ssid, password):
