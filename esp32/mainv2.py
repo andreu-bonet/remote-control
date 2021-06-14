@@ -66,7 +66,7 @@ anode_valve = Single(pin=14, engage_value=1, disengage_value=0)
 
 def stiring(duration_ms):
 	stirrer_stepper.power_on()
-	stirrer_stepper.set_dir(1)
+	stirrer_stepper.set_direction(1)
 	deadline = ticks_add(time.ticks_ms(), duration_ms)
 	while ticks_diff(deadline, time.ticks_ms()) > 0:
 		stirrer_stepper.rotate_steps(1)
@@ -112,11 +112,11 @@ while True:
 		stiring(int(command[1]))
 
 	elif command[0] == 'autosampler':
-		sampler_stepper.set_dir(int(command[1]))
+		sampler_stepper.set_direction(int(command[1]))
 		sampler_stepper.rotate_mm(int(command[2]))
 
 	elif command[0] == 'syringepump':
-		syringe_stepper.set_dir(int(command[1]))
+		syringe_stepper.set_direction(int(command[1]))
 		syringe_stepper.rotate_mm(int(command[2]))
 
 	elif command[0] == 'valvecathode':
