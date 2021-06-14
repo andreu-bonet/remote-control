@@ -8,7 +8,7 @@ class Endpoint:
 		self.pin = Pin(pin, Pin.IN)
 
 	def status(self):
-		return self.pin.value
+		return self.pin.value()
 
 endpoint = Endpoint(pin=25)
 
