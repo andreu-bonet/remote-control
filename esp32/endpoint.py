@@ -2,6 +2,7 @@ from machine import Pin
 import time
 from utime import ticks_add
 from utime import ticks_diff
+from time import sleep_us
 
 class Endpoint:
 	def __init__(self, pin):
