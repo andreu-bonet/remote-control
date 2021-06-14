@@ -2,10 +2,10 @@
   "name": "led-remote-control",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/src/main.js",
+  "main": "dist/main.js",
   "scripts": {
-    "start": "node ./dist/src/main.js",
-    "start:dev": "nodemon ./dist/src/main.js",
+    "start": "node ./dist/main.js",
+    "start:dev": "nodemon ./dist/main.js",
     "build": "tsc",
     "watch": "tsc -w"
   },
