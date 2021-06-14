@@ -41,7 +41,7 @@ class Stepper:
 endpoint = Endpoint(pin=25)
 sampler_stepper = Stepper(stp_pin= 2, dir_pin= 4, pow_pin=15, step_sleep_us=100)
 
-sampler_stepper.set_dir(0)
+sampler_stepper.set_direction(0)
 sampler_stepper.power_on()
 
 while endpoint.status() == 1:
