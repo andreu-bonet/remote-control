@@ -1,143 +1,106 @@
 import network
 import usocket
-import time
-from utime import ticks_add
-from utime import ticks_diff
 from machine import Pin
 from time import sleep_us
+from time import ticks_ms
+from utime import ticks_add
+from utime import ticks_diff
 
 
-class Precision_Stepper:
-	"""Class for stepper motor"""
-	def __init__(self, step_pin, dir_pin, en_pin, step_time=1000, steps_per_rev=1600):
-		"""Initialise stepper."""
-		self.stp = Pin(step_pin, Pin.OUT)
+class Stepper:
+	def __init__(self, stp_pin, dir_pin, pow_pin, step_sleep_us=1000, full_rev=360, step_angle=1.8, pitch_mm=8, microstepping=32):
+		self.stp = Pin(stp_pin, Pin.OUT)
 		self.dir = Pin(dir_pin, Pin.OUT)
-		self.en = Pin(en_pin, Pin.OUT, value=0)
-
-		self.step_time = step_time  # us
-		self.steps_per_rev = steps_per_rev
+		self.pow = Pin(pow_pin, Pin.OUT, value=0)
+		self.step_sleep_us = step_sleep_us
+		self.steps_per_mm = ((full_rev / step_angle) / pitch_mm) * microstepping
 
 	def power_on(self):
-		"""Power on stepper."""
-		self.en.value(0)
+		self.pow.value(0)
 
 	def power_off(self):
-		"""Power off stepper."""
-		self.en.value(1)
+		self.pow.value(1)
 
-	def set_dir(self, _dir):
-		self.dir.value(_dir)
+	def set_direction(self, direction):
+		self.dir.value(direction)
 
-	def steps(self, step_count):
-		"""Rotate stepper for given steps."""
-		for i in range(abs(step_count)):
+	def rotate_steps(self, steps):
+		for i in range(abs(steps)):
 			self.stp.value(1)
-			sleep_us(self.step_time)
+			sleep_us(self.step_sleep_us)
 			self.stp.value(0)
-			sleep_us(self.step_time)
+			sleep_us(self.step_sleep_us)
 
-	def mm(self, mm, step_per_mm):
-		self.steps(mm * step_per_mm)
+	def rotate_mm(self, mm):
+		self.power_on()
+		self.rotate_steps(mm * self.steps_per_mm)
+		self.power_off()
 
-	def set_step_time(self, us):
-		"""Set time in microseconds between each step."""
-		self.step_time = us
-
-class Valve:
-	"""Class for opening and closing valves"""
-	def __init__(self, pin):
-		"""Initialise valve."""
-		self.pin = pin
+class Single:
+	def __init__(self, pin, engage_value=0, disengage_value=1):
 		self.pin = Pin(pin, Pin.OUT)
+		self.engage_value = engage_value
+		self.disengage_value = disengage_value
 		self.disengage()
 
-	def engage(self):
-		"""Power on valve."""
-		self.pin.value(1)
-
-	def disengage(self):
-		"""Power off valve."""
-		self.pin.value(0)
-
 	def status(self):
-		"""Return status of the valve. 0 disengaged - 1 engaged"""
 		return self.pin.value
 
-class Peristaltic_Pump:
-	"""Class for start and stop Gilson Peristaltic_Pump"""
-	def __init__(self, pin):
-		"""Initialise Pump."""
-		self.pin = pin
-		self.pin = Pin(pin, Pin.OUT)
+	def engage(self):
+		self.pin.value(self.engage_value)
+
+	def disengage(self):
+		self.pin.value(self.disengage_value)
+
+	def activate(self, duration_ms):
+		self.engage()
+		sleep_ms(duration_ms)
 		self.disengage()
 
-	def engage(self):
-		"""Power on valve."""
-		self.pin.value(0)
-
-	def disengage(self):
-		"""Power off valve."""
-		self.pin.value(1)
+class Endpoint:
+	def __init__(self, pin):
+		self.pin = Pin(pin, Pin.IN)
 
 	def status(self):
-		"""Return status of the valve. 0 disengaged - 1 engaged"""
-		return self.pin.value
+		return self.pin.value()
 
-Steppers_Stirring = Precision_Stepper(step_pin=19, dir_pin=21, en_pin=18, step_time=1000)
-Stepper_Autosampler = Precision_Stepper(step_pin=2, dir_pin=4, en_pin=15, step_time=1)
-Stepper_Syringe_Pump = Precision_Stepper(step_pin=32, dir_pin=5, en_pin=33, step_time=1000)
-Valve_Cathode = Valve(pin=27)
-Valve_Anode = Valve(pin=14)
-Pump = Peristaltic_Pump(pin=26)
 
-Microstepping = 32
-Standard_Step_Angle = 1.8
-Pich_in_mm = 8
-Full_rev = 360
-Relation = (Full_rev / Standard_Step_Angle) / Pich_in_mm
-Step_Per_mm = Relation * Microstepping
+stirrer_stepper = Stepper(stp_pin=19, dir_pin=21, pow_pin=18)
+sampler_stepper = Stepper(stp_pin= 2, dir_pin= 4, pow_pin=15, step_sleep_us=100)
+syringe_stepper = Stepper(stp_pin=32, dir_pin= 5, pow_pin=33)
+perist_pump = Single(pin=26, engage_value=0, disengage_value=1)
+catho_valve = Single(pin=27, engage_value=1, disengage_value=0)
+anode_valve = Single(pin=14, engage_value=1, disengage_value=0)
+endpoint = Endpoint(pin=25)
 
-def stiring(duration_seconds):
-	Steppers_Stirring.power_on()
-	Steppers_Stirring.set_dir(1)
-	deadline = ticks_add(time.ticks_ms(), duration_seconds * 1000)
-	while ticks_diff(deadline, time.ticks_ms()) > 0:
-		Steppers_Stirring.steps(1)
-	Steppers_Stirring.power_off()
+def zeroing_sampler():
+	sampler_stepper.set_direction(1)
+	sampler_stepper.power_on()
+	while endpoint.status() == 1:
+		sampler_stepper.rotate_steps(1)
+	sampler_stepper.power_off()
 
-def autosampler(direction, travel):
-	Stepper_Autosampler.set_dir(direction)
-	Stepper_Autosampler.power_on()
-	Stepper_Autosampler.mm(abs(travel), Step_Per_mm)
-	Stepper_Autosampler.power_off()
+def setup():
+	stirrer_stepper.power_off()
+	sampler_stepper.power_off()
+	syringe_stepper.power_off()
+	peristalticpump.disengage()
+	catho_valve.disengage()
+	anode_valve.disengage()
+	zeroing_sampler()
 
-def syringepump(direction, travel):
-	Stepper_Syringe_Pump.set_dir(direction)
-	Stepper_Syringe_Pump.power_on()
-	Stepper_Syringe_Pump.mm(abs(travel), Step_Per_mm)
-	Stepper_Syringe_Pump.power_off()
+def stiring(duration_ms):
+	stirrer_stepper.power_on()
+	stirrer_stepper.set_direction(1)
+	deadline = ticks_add(ticks_ms(), duration_ms)
+	while ticks_diff(deadline, ticks_ms()) > 0:
+		stirrer_stepper.rotate_steps(1)
+	stirrer_stepper.power_off()
 
-def valvecathode(duration_miliseconds):
-	Valve_Cathode.engage()
-	deadline = ticks_add(time.ticks_ms(), duration_miliseconds)
-	while ticks_diff(deadline, time.ticks_ms()) > 0:
+def sleep_ms(ms):
+	deadline = ticks_add(ticks_ms(), ms)
+	while ticks_diff(deadline, ticks_ms()) > 0:
 		pass
-	Valve_Cathode.disengage()
-
-def valveanode(duration_miliseconds):
-	Valve_Anode.engage()
-	deadline = ticks_add(time.ticks_ms(), duration_miliseconds)
-	while ticks_diff(deadline, time.ticks_ms()) > 0:
-		pass
-	Valve_Anode.disengage()
-
-def peristalticpump(duration_miliseconds):
-	Pump.engage()
-	deadline = ticks_add(time.ticks_ms(), duration_miliseconds)
-	while ticks_diff(deadline, time.ticks_ms()) > 0:
-		pass
-	Pump.disengage()
 
 def wifiConnect(ssid, password):
 	station = network.WLAN(network.STA_IF)
@@ -155,6 +118,8 @@ def wifiConnect(ssid, password):
 
 	return station.ifconfig()
 
+setup()
+
 ifconfig = wifiConnect('Eurecat_Lab', 'Eureca2021!')
 
 print(ifconfig)
@@ -167,19 +132,29 @@ while True:
 	conn, addr = socket.accept()
 	payload = conn.recv(1024).decode('utf-8')
 	command = payload.split('\r\n')[-1].split(' ')
+	
 	print(command)
+
 	if command[0] == 'stiring':
 		stiring(int(command[1]))
+
 	elif command[0] == 'autosampler':
-		autosampler(int(command[1]), int(command[2]))
+		sampler_stepper.set_direction(int(command[1]))
+		sampler_stepper.rotate_mm(int(command[2]))
+
 	elif command[0] == 'syringepump':
-		syringepump(int(command[1]), int(command[2]))
+		syringe_stepper.set_direction(int(command[1]))
+		syringe_stepper.rotate_mm(int(command[2]))
+
 	elif command[0] == 'valvecathode':
-		valvecathode(int(command[1]))
+		catho_valve.activate(int(command[1]))
+
 	elif command[0] == 'valveanode':
-		valveanode(int(command[1]))
+		anode_valve.activate(int(command[1]))
+
 	elif command[0] == 'peristalticpump':
-		peristalticpump(int(command[1]))
+		perist_pump.activate(int(command[1]))
+
 	conn.send('HTTP/1.1 200 OK\n')
 	conn.send('Content-Type: text/plain\n')
 	conn.send('Connection: close\n\n')
