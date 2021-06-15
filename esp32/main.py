@@ -84,7 +84,7 @@ def setup():
 	stirrer_stepper.power_off()
 	sampler_stepper.power_off()
 	syringe_stepper.power_off()
-	peristalticpump.disengage()
+	perist_pump.disengage()
 	catho_valve.disengage()
 	anode_valve.disengage()
 	zeroing_sampler()
