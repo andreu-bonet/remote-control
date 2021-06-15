@@ -66,7 +66,7 @@ class Endpoint:
 
 
 stirrer_stepper = Stepper(stp_pin=19, dir_pin=21, pow_pin=18)
-sampler_stepper = Stepper(stp_pin= 2, dir_pin= 4, pow_pin=15, step_sleep_us=100)
+sampler_stepper = Stepper(stp_pin= 2, dir_pin= 4, pow_pin=15, step_sleep_us=10)
 syringe_stepper = Stepper(stp_pin=32, dir_pin= 5, pow_pin=33)
 perist_pump = Single(pin=26, engage_value=0, disengage_value=1)
 catho_valve = Single(pin=27, engage_value=1, disengage_value=0)
@@ -87,7 +87,7 @@ def setup():
 	perist_pump.disengage()
 	catho_valve.disengage()
 	anode_valve.disengage()
-	zeroing_sampler()
+	# zeroing_sampler()
 
 def stiring(duration_ms):
 	stirrer_stepper.power_on()
@@ -154,6 +154,9 @@ while True:
 
 	elif command[0] == 'peristalticpump':
 		perist_pump.activate(int(command[1]))
+
+	elif command[0] == 'autosampler_zeroing':
+		zeroing_sampler()
 
 	conn.send('HTTP/1.1 200 OK\n')
 	conn.send('Content-Type: text/plain\n')
