@@ -87,7 +87,6 @@ def setup():
 	perist_pump.disengage()
 	catho_valve.disengage()
 	anode_valve.disengage()
-	# zeroing_sampler()
 
 def stiring(duration_ms):
 	stirrer_stepper.power_on()
