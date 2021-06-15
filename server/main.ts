@@ -11,8 +11,12 @@ const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (_req: Request, res: Response) => {
 	res.sendFile(path.join(process.cwd(), 'public', 'index.html'))
+})
+
+app.get('/sequence', (_req: Request, res: Response) => {
+	res.sendFile(path.join(process.cwd(), 'public', 'sequence', 'index.html'))
 })
 
 app.post('/esp32', (req: Request, res: Response) => {
@@ -49,6 +53,54 @@ app.post('/', async (req: Request, res: Response) => {
 		axios.post(process.env.ESP32_IP, data).catch(err => console.log(err.errno))
 	}
 	res.sendFile(path.join(process.cwd(), 'public', 'index.html'))
+})
+
+app.post('/sequence', async (req: Request, res: Response) => {
+	if (!process.env.ESP32_IP) return
+	console.log('START SETUP')
+	console.log('autosampler 0 128')
+	await axios.post(process.env.ESP32_IP, 'autosampler 0 128')
+	console.log('peristalticpump 7500')
+	await axios.post(process.env.ESP32_IP, 'peristalticpump 7500')
+	console.log('valvecathode 15000')
+	await axios.post(process.env.ESP32_IP, 'valvecathode 15000')
+	console.log('valveanode 15000')
+	await axios.post(process.env.ESP32_IP, 'valveanode 15000')
+	console.log('syringepump 0 12000')
+	await axios.post(process.env.ESP32_IP, 'syringepump 0 12000')
+	console.log('valvecathode 15000')
+	await axios.post(process.env.ESP32_IP, 'valvecathode 15000')
+	console.log('valveanode 15000')
+	await axios.post(process.env.ESP32_IP, 'valveanode 15000')
+	console.log('END SETUP')
+	console.log('START EXPERIMENT')
+	console.log('autosampler 1 128')
+	await axios.post(process.env.ESP32_IP, 'autosampler 1 128')
+	console.log('syringepump 0 8500')
+	await axios.post(process.env.ESP32_IP, 'syringepump 0 8500')
+	console.log('AUTOCLICKING')
+	console.log()
+	console.log(`stiring ${req.body.stiring}`)
+	await axios.post(process.env.ESP32_IP, `stiring ${req.body.stiring}`)
+	console.log('AUTOCLICKING')
+	console.log('valvecathode 15000')
+	await axios.post(process.env.ESP32_IP, 'valvecathode 15000')
+	console.log('valveanode 15000')
+	await axios.post(process.env.ESP32_IP, 'valveanode 15000')
+	console.log('END EXPERIMENT')
+	console.log('START CLEANING')
+	console.log('autosampler 0 128')
+	await axios.post(process.env.ESP32_IP, 'autosampler 0 128')
+	console.log('peristalticpump 8250')
+	await axios.post(process.env.ESP32_IP, 'peristalticpump 8250')
+	console.log('stiring 10000')
+	await axios.post(process.env.ESP32_IP, 'stiring 10000')
+	console.log('valvecathode 15000')
+	await axios.post(process.env.ESP32_IP, 'valvecathode 15000')
+	console.log('valveanode 15000')
+	await axios.post(process.env.ESP32_IP, 'valveanode 15000')
+	console.log('END CLEANING')
+	res.sendFile(path.join(process.cwd(), 'public', 'sequence', 'index.html'))
 })
 
 app.listen(configService.get('PORT', 3000))
