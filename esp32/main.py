@@ -144,7 +144,9 @@ while True:
 
 	elif command[0] == 'syringepump':
 		syringe_stepper.set_direction(int(command[1]))
-		syringe_stepper.rotate_mm(int(command[2]))
+		syringe_stepper.power_on()
+		syringe_stepper.rotate_steps(int(command[2]))
+		syringe_stepper.power_off()
 
 	elif command[0] == 'valvecathode':
 		catho_valve.activate(int(command[1]))
