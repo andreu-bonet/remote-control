@@ -21,4 +21,5 @@ async function x() {
 	}
 }
 
+console.log(robot.getScreenSize())
 x()
